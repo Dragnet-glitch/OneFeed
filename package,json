@@ -1,0 +1,13 @@
+{
+  "name": "onefeed-frontend",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "npx serve public -p $PORT"
+  },
+  "dependencies": {
+    "serve": "^14.0.0"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}

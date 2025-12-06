@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OneFeed - Complete on Railway</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+      }
+
+      .container {
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        width: 350px;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 30px;
+        text-align: center;
+      }
+
+      input {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border: 2px solid #ddd;
+        border-radius: 6px;
+        font-size: 16px;
+      }
+
+      button {
+        width: 100%;
+        padding: 12px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+
+      button:hover {
+        background: #5a67d8;
+      }
+
+      .message {
+        padding: 10px;
+        border-radius: 6px;
+        margin: 10px 0;
+        display: none;
+      }
+
+      .success {
+        background: #d4edda;
+        color: #155724;
+      }
+
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+
+      .tabs {
+        display: flex;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #eee;
+      }
+
+      .tab {
+        flex: 1;
+        text-align: center;
+        padding: 10px;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+      }
+
+      .tab.active {
+        border-bottom-color: #667eea;
+        font-weight: bold;
+        color: #667eea;
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔐 OneFeed</h1>
+
+      <div class="tabs">
+        <div class="tab active" onclick="showTab('login')">Login</div>
+        <div class="tab" onclick="showTab('signup')">Sign Up</div>
+      </div>
+
+      <div id="login" class="tab-content active">
+        <div id="loginMessage" class="message"></div>
+        <input type="email" id="loginEmail" placeholder="Email" />
+        <input type="password" id="loginPassword" placeholder="Password" />
+        <button onclick="login()">Login</button>
+      </div>
+
+      <div id="signup" class="tab-content">
+        <div id="signupMessage" class="message"></div>
+        <input type="text" id="name" placeholder="Full Name" />
+        <input type="email" id="signupEmail" placeholder="Email" />
+        <input type="password" id="signupPassword" placeholder="Password" />
+        <button onclick="signup()">Create Account</button>
+      </div>
+    </div>
+
+    <script>
+      // API Base URL - Same domain since everything is on Railway
+      const API_URL = window.location.origin + "/api";
+
+      function showTab(tabName) {
+        // Update tabs
+        document.querySelectorAll(".tab").forEach((tab) => {
+          tab.classList.remove("active");
+        });
+        document.querySelectorAll(".tab-content").forEach((content) => {
+          content.classList.remove("active");
+        });
+
+        // Show selected tab
+        document
+          .querySelector(`[onclick="showTab('${tabName}')"]`)
+          .classList.add("active");
+        document.getElementById(tabName).classList.add("active");
+      }
+
+      function showMessage(elementId, text, type) {
+        const el = document.getElementById(elementId);
+        el.textContent = text;
+        el.className = `message ${type}`;
+        el.style.display = "block";
+      }
+
+      async function signup() {
+        const name = document.getElementById("name").value;
+        const email = document.getElementById("signupEmail").value;
+        const password = document.getElementById("signupPassword").value;
+
+        try {
+          const response = await fetch(`${API_URL}/signup`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, password }),
+          });
+
+          const data = await response.json();
+          showMessage("signupMessage", data.message, "success");
+        } catch (error) {
+          showMessage("signupMessage", "Error: " + error.message, "error");
+        }
+      }
+
+      async function login() {
+        const email = document.getElementById("loginEmail").value;
+        const password = document.getElementById("loginPassword").value;
+
+        try {
+          const response = await fetch(`${API_URL}/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+
+          const data = await response.json();
+          showMessage("loginMessage", data.message, "success");
+        } catch (error) {
+          showMessage("loginMessage", "Error: " + error.message, "error");
+        }
+      }
+
+      // Test backend connection on load
+      fetch(`${API_URL}/health`)
+        .then((res) => res.json())
+        .then((data) => console.log("Backend connected:", data))
+        .catch((err) => console.log("Backend check:", err));
+    </script>
+  </body>
+</html>

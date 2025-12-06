@@ -1,0 +1,10 @@
+{
+  "build": {
+    "builder": "NIXPACKS",
+    "buildCommand": "echo 'Building frontend...'"
+  },
+  "deploy": {
+    "startCommand": "npx serve public -p $PORT",
+    "restartPolicyType": "ON_FAILURE"
+  }
+}
